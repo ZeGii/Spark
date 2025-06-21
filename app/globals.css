@@ -1,0 +1,282 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 97%;
+    --secondary: 45 93% 47%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 243 10% 96%;
+    --ring: 142 76% 36%;
+    --radius: 0.75rem;
+    --chart-1: 142 76% 36%;
+    --chart-2: 45 93% 47%;
+    --chart-3: 210 30% 8%;
+    --chart-4: 215.4 16.3% 46.9%;
+    --chart-5: 0 84.2% 60.2%;
+  }
+
+  .dark {
+    --background: 210 30% 8%;
+    --foreground: 210 40% 98%;
+    --card: 210 30% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 210 30% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 97%;
+    --secondary: 45 93% 47%;
+    --secondary-foreground: 210 30% 8%;
+    --muted: 210 30% 15%;
+    --muted-foreground: 215.4 16.3% 65%;
+    --accent: 210 30% 15%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 210 30% 18%;
+    --input: 210 30% 15%;
+    --ring: 142 76% 36%;
+    --chart-1: 142 76% 36%;
+    --chart-2: 45 93% 47%;
+    --chart-3: 210 40% 98%;
+    --chart-4: 215.4 16.3% 65%;
+    --chart-5: 0 84.2% 60.2%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes countUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-count-up {
+  animation: countUp 0.6s ease-out;
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 42%) 100%);
+}
+
+.gradient-bg-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(45 93% 52%) 100%);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 42%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(45 93% 52%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card shadows and effects - Theme A3 inspired */
+.card-shadow {
+  box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.08), 0 4px 12px -4px rgb(0 0 0 / 0.05);
+}
+
+.card-shadow-lg {
+  box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.1), 0 8px 20px -4px rgb(0 0 0 / 0.08);
+}
+
+.card-shadow-xl {
+  box-shadow: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 16px 32px -8px rgb(0 0 0 / 0.1);
+}
+
+/* Enhanced card styling for Theme A3 */
+.theme-card {
+  @apply bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
+}
+
+.theme-card:hover {
+  @apply shadow-lg border-gray-200 transform translate-y-[-2px];
+}
+
+/* Form styling for Theme A2 */
+.theme-form-card {
+  @apply bg-white border border-gray-100 rounded-xl shadow-sm p-6;
+}
+
+.theme-input {
+  @apply bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200;
+}
+
+.theme-input:focus {
+  @apply outline-none;
+}
+
+/* Background patterns */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.bg-dots-pattern {
+  background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Button enhancements - Theme A2/A3 inspired */
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg font-medium;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg font-medium;
+}
+
+.btn-outline-primary {
+  @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200 rounded-lg font-medium;
+}
+
+/* Theme A2 form buttons with arrows */
+.btn-form-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2;
+}
+
+.btn-form-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 px-6 py-3 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2;
+}
+
+/* Progress bars and metrics - Theme A3 */
+.progress-bar-primary {
+  @apply bg-primary/20 rounded-full overflow-hidden;
+}
+
+.progress-fill-primary {
+  @apply bg-primary h-full rounded-full transition-all duration-500 ease-out;
+}
+
+.metric-card {
+  @apply bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300;
+}
+
+.metric-value {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.metric-label {
+  @apply text-sm text-gray-600 font-medium;
+}
+
+.metric-change-positive {
+  @apply text-primary text-sm font-medium flex items-center gap-1;
+}
+
+.metric-change-negative {
+  @apply text-red-500 text-sm font-medium flex items-center gap-1;
+}
+
+/* Typography enhancements */
+.text-gradient-primary {
+  @apply gradient-text font-bold;
+}
+
+.text-gradient-secondary {
+  @apply gradient-text-secondary font-bold;
+}
+
+/* Layout improvements */
+.section-padding {
+  @apply py-16 px-4 sm:px-6 lg:px-8;
+}
+
+.container-max {
+  @apply max-w-7xl mx-auto;
+}
+
+/* Dark theme specific adjustments */
+.dark-card {
+  @apply bg-card text-card-foreground border border-border/50 shadow-lg;
+}
+
+.dark-card:hover {
+  @apply shadow-xl border-border;
+}

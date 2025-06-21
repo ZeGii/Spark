@@ -1,0 +1,335 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/spark-platform/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String      @id @default(cuid())
+  email       String      @unique
+  username    String      @unique
+  name        String
+  password    String
+  profileType ProfileType
+  industry    String
+  country     String
+  role        String      @default("user") // user, admin
+  status      UserStatus  @default(ACTIVE) // active, suspended
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  topics        Topic[]
+  votes         Vote[]
+  subscriptions Subscription[]
+  notifications Notification[]
+  sparks        Spark[]
+  sessions      Session[]
+  approvedTopics Topic[] @relation("TopicApprover")
+  opportunitySparks OpportunitySpark[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Topic {
+  id              String      @id @default(cuid())
+  title           String
+  description     String
+  industry        String
+  country         String
+  status          TopicStatus @default(PENDING)
+  voteCount       Int         @default(0)
+  voteThreshold   Int?        // Set by admin when approving
+  approvalDate    DateTime?   // When admin approved
+  deadline        DateTime?   // 15 days from approval
+  rejectionReason String?     // Optional reason for rejection
+  convertedAt     DateTime?   // When converted to research
+  completedAt     DateTime?   // When research completed
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  proposedBy    User           @relation(fields: [proposedById], references: [id])
+  proposedById  String
+  approvedBy    User?          @relation("TopicApprover", fields: [approvedById], references: [id])
+  approvedById  String?
+  votes         Vote[]
+  research      Research?
+  notifications Notification[]
+
+  @@map("topics")
+}
+
+model Vote {
+  id       String @id @default(cuid())
+  topicId  String
+  userId   String
+  votedAt  DateTime @default(now())
+
+  // Relations
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, userId])
+  @@map("votes")
+}
+
+model Research {
+  id                    String            @id @default(cuid())
+  title                 String
+  brief                 String
+  executiveSummary      String
+  methodology           String
+  keyFindings           String[]
+  marketSize            String?
+  growthRate            String?
+  competitorCount       Int?
+  releaseDate           DateTime
+  status                ResearchStatus    @default(DRAFT)
+  isPublished           Boolean           @default(false)
+  publishedAt           DateTime?
+  aiProcessingStatus    AIProcessingStatus @default(PENDING)
+  aiProcessingMetadata  Json?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  // Relations
+  topicId               String              @unique
+  topic                 Topic               @relation(fields: [topicId], references: [id])
+  competitiveAnalysis   CompetitiveAnalysis[]
+  pouAnalysis           POUAnalysis[]
+  researchDocuments     ResearchDocument[]
+  opportunities         Opportunity[]
+
+  @@map("research")
+}
+
+model ResearchDocument {
+  id                    String            @id @default(cuid())
+  filename              String
+  originalName          String
+  fileSize              Int
+  mimeType              String
+  filePath              String
+  uploadedAt            DateTime          @default(now())
+  processedAt           DateTime?
+  aiProcessingStatus    AIProcessingStatus @default(PENDING)
+  aiProcessingMetadata  Json?
+  extractedContent      String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  // Relations
+  researchId            String
+  research              Research          @relation(fields: [researchId], references: [id], onDelete: Cascade)
+
+  @@map("research_documents")
+}
+
+model Opportunity {
+  id                    String   @id @default(cuid())
+  title                 String
+  problemStatement      String
+  targetAudience        String
+  marketEvidence        String
+  geographicFocus       Json     // {primary: [], secondary: [], tertiary: []}
+  marketSize            String
+  growthRate            String?
+  severity              Int      @default(1) // 1-10 scale
+  urgency               Int      @default(1) // 1-10 scale
+  opportunityStatement  String
+  creativityNote        String?
+  sparkCount            Int      @default(0)
+  releaseDate           DateTime @default(now())
+  isPublished           Boolean  @default(false)
+  publishedAt           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  researchId            String
+  research              Research @relation(fields: [researchId], references: [id], onDelete: Cascade)
+  opportunitySparks     OpportunitySpark[]
+
+  @@map("opportunities")
+}
+
+model OpportunitySpark {
+  id            String      @id @default(cuid())
+  userId        String
+  opportunityId String
+  createdAt     DateTime    @default(now())
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, opportunityId])
+  @@map("opportunity_sparks")
+}
+
+model CompetitiveAnalysis {
+  id           String @id @default(cuid())
+  companyName  String
+  description  String
+  marketShare  String?
+  strengths    String[]
+  weaknesses   String[]
+  fundingStage String?
+  revenue      String?
+
+  // Relations
+  researchId String
+  research   Research @relation(fields: [researchId], references: [id], onDelete: Cascade)
+
+  @@map("competitive_analysis")
+}
+
+model POUAnalysis {
+  id                    String   @id @default(cuid())
+  title                 String
+  problemStatement      String
+  targetAudience        String
+  targetDemographics    String?
+  targetIndustry        String?
+  targetFinancialStatus String?
+  targetOccupation      String?
+  marketEvidence        String
+  marketSize            String
+  growthRate            String?
+  marketStatistics      String[]
+  painPoints            String[]
+  solutions             String[]
+  competition           String
+  barriers              String[]
+  severity              Int      @default(1) // 1-10 scale
+  urgency               Int      @default(1) // 1-10 scale
+  opportunityStatement  String?
+  creativityNote        String?
+  timeline              String
+  sparkCount            Int      @default(0)
+  releaseDate           DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  researchId String
+  research   Research @relation(fields: [researchId], references: [id], onDelete: Cascade)
+  sparks     Spark[]
+
+  @@map("pou_analysis")
+}
+
+model Subscription {
+  id        String           @id @default(cuid())
+  plan      SubscriptionPlan
+  status    String           @default("active")
+  startDate DateTime         @default(now())
+  endDate   DateTime?
+  createdAt DateTime         @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId String?
+  topic   Topic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum ProfileType {
+  ENTREPRENEUR
+  INVESTOR
+  PRODUCT_MANAGER
+  BUSINESS_ANALYST
+}
+
+enum TopicStatus {
+  PENDING     // Newly proposed, awaiting admin approval
+  APPROVED    // Admin approved, now open for voting
+  REJECTED    // Admin rejected
+  QUALIFIED   // Reached vote threshold, ready for research
+  CONVERTED   // Converted to research record
+  COMPLETED   // Research completed
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+}
+
+enum ResearchStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AIProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model Spark {
+  id        String   @id @default(cuid())
+  userId    String
+  pouId     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pou  POUAnalysis @relation(fields: [pouId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pouId])
+  @@map("sparks")
+}
+
+model AdminSettings {
+  id                String   @id @default(cuid())
+  key               String   @unique
+  value             String
+  description       String?
+  updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
+
+  @@map("admin_settings")
+}
