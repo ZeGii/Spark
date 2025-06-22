@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     })
 
     const categoryPerformance = await Promise.all(
-      categoryData.map(async (cat) => {
+      categoryData.map(async (cat: any) => {
         const qualifiedInCategory = await prisma.topic.count({
           where: {
             ...dateFilter,

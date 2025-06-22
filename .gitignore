@@ -17,3 +17,12 @@ build/
 .cache/
 .temp/
 .tmp/
+
+# Build and cache files
+.build/
+.next/
+.next-backup/
+node_modules/
+*.log
+tsconfig.tsbuildinfo
+.abacus.donotdelete

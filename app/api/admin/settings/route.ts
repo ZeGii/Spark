@@ -16,7 +16,7 @@ export async function GET() {
     })
 
     // Convert to key-value object for easier frontend consumption
-    const settingsObject = settings.reduce((acc, setting) => {
+    const settingsObject = settings.reduce((acc: Record<string, any>, setting: any) => {
       acc[setting.key] = {
         value: setting.value,
         description: setting.description,
@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Use transaction to update all settings atomically
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       const updatedSettings = []
 
       for (const [key, value] of Object.entries(settings)) {

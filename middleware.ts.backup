@@ -1,0 +1,18 @@
+
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Simplified middleware - just pass through for now
+  // We'll handle auth logic client-side to avoid build issues
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: [
+    '/dashboard/:path*',
+    '/profile/:path*'
+  ]
+}

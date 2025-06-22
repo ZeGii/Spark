@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingTopics.length !== topicIds.length) {
-      const foundIds = existingTopics.map(t => t.id)
+      const foundIds = existingTopics.map((t: any) => t.id)
       const missingIds = topicIds.filter(id => !foundIds.includes(id))
       return NextResponse.json(
         { error: `Topics not found: ${missingIds.join(', ')}` },
@@ -69,18 +69,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if any topics are not in PENDING status
-    const nonPendingTopics = existingTopics.filter(t => t.status !== 'PENDING')
+    const nonPendingTopics = existingTopics.filter((t: any) => t.status !== 'PENDING')
     if (nonPendingTopics.length > 0) {
       return NextResponse.json(
         { 
-          error: `Cannot approve topics that are not pending: ${nonPendingTopics.map(t => t.title).join(', ')}` 
+          error: `Cannot approve topics that are not pending: ${nonPendingTopics.map((t: any) => t.title).join(', ')}` 
         },
         { status: 400 }
       )
     }
 
     // Use transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       const approvalDate = new Date()
       const deadline = calculateDeadline(approvalDate) // Use same function as individual approve
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Create notifications for topic submitters - matches individual approve message
-      const notifications = existingTopics.map(topic => ({
+      const notifications = existingTopics.map((topic: any) => ({
         userId: topic.proposedBy.id,
         topicId: topic.id,
         title: 'Topic Approved!',

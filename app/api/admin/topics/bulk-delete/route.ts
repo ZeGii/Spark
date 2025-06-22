@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingTopics.length !== topicIds.length) {
-      const foundIds = existingTopics.map(t => t.id)
+      const foundIds = existingTopics.map((t: any) => t.id)
       const missingIds = topicIds.filter(id => !foundIds.includes(id))
       return NextResponse.json(
         { error: `Topics not found: ${missingIds.join(', ')}` },
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Delete related votes first
       await tx.vote.deleteMany({
         where: {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (research.length > 0) {
-        const researchIds = research.map(r => r.id)
+        const researchIds = research.map((r: any) => r.id)
         
         // Delete related research documents
         await tx.researchDocument.deleteMany({

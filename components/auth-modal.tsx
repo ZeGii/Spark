@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Mail, Lock, User, Briefcase, MapPin, Building, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
+
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
@@ -147,8 +148,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg bg-white border border-gray-100 shadow-xl rounded-xl">
-        <DialogHeader className="text-center pb-6">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] bg-white border border-gray-100 shadow-xl rounded-xl flex flex-col">
+        <DialogHeader className="text-center pb-6 flex-shrink-0">
           <div className="flex items-center justify-center mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
               <Building className="w-6 h-6 text-primary-foreground" />
@@ -162,46 +163,49 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           </p>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
+        <div className="flex-1 overflow-y-auto custom-scrollbar-left">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 sticky top-0 z-10 bg-white">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
 
-          <AnimatePresence mode="wait">
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className={`px-4 py-3 rounded-md text-sm mt-4 ${
-                  isSuspended 
-                    ? 'bg-orange-50 border border-orange-200 text-orange-800' 
-                    : 'bg-destructive/10 border border-destructive/20 text-destructive'
-                }`}
-              >
-                <div className="flex items-start space-x-2">
-                  {isSuspended && (
-                    <svg 
-                      className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                  <div>
-                    {isSuspended && (
-                      <p className="font-semibold text-orange-800 mb-1">Account Suspended</p>
-                    )}
-                    <p>{error}</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <div className="px-1">
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={`px-4 py-3 rounded-md text-sm mt-4 ${
+                      isSuspended 
+                        ? 'bg-orange-50 border border-orange-200 text-orange-800' 
+                        : 'bg-destructive/10 border border-destructive/20 text-destructive'
+                    }`}
+                  >
+                    <div className="flex items-start space-x-2">
+                      {isSuspended && (
+                        <svg 
+                          className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      <div>
+                        {isSuspended && (
+                          <p className="font-semibold text-orange-800 mb-1">Account Suspended</p>
+                        )}
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-          <TabsContent value="login" className="mt-6">
+          <TabsContent value="login" className="mt-6 px-1 pb-4">
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-gray-900">Email</Label>
@@ -251,7 +255,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             </form>
           </TabsContent>
 
-          <TabsContent value="signup" className="mt-6">
+          <TabsContent value="signup" className="mt-6 px-1 pb-4">
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -408,7 +412,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               </Button>
             </form>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

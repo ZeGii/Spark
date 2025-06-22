@@ -3,11 +3,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
-  Zap, 
   Menu,
   X,
   Bell,
@@ -23,6 +23,9 @@ const Navigation = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
   const { user, loading } = useAuth()
+  
+  // Check if we're in admin area
+  const isAdminArea = pathname.startsWith('/admin')
 
   const navItems = [
     { href: '/trending', label: 'Trending Topics' },
@@ -34,13 +37,32 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
-              <Zap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-gradient-primary">Spark</span>
-          </Link>
+          {/* Logo - Hidden in admin areas */}
+          {!isAdminArea && (
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
+                <Image
+                  src="/images/Spark icon logo.png"
+                  alt="Spark Icon"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 object-contain"
+                />
+              </div>
+              <div className="flex items-center">
+                <Image
+                  src="/images/Spark logo text.png"
+                  alt="Spark"
+                  width={80}
+                  height={32}
+                  className="h-8 w-auto object-contain"
+                />
+              </div>
+            </Link>
+          )}
+          
+          {/* Spacer for admin areas to maintain layout */}
+          {isAdminArea && <div></div>}
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2">

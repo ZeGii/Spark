@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/auth-context'
 
@@ -54,26 +55,18 @@ const AdminSidebar = ({ collapsed, onToggleCollapse }: AdminSidebarProps) => {
     )}>
       {/* Header */}
       <div className="p-4 border-b border-white/20">
-        <div className="flex items-center justify-between">
-          {!collapsed && (
-            <Link href="/admin" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#00FF88] to-[#10B981] rounded-lg flex items-center justify-center shadow-lg">
-                <Shield className="w-5 h-5 text-black" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-white">Spark</span>
-                <Badge variant="outline" className="text-xs bg-[#f5d565]/20 text-[#f5d565] border-[#f5d565]/30">
-                  Admin
-                </Badge>
-              </div>
-            </Link>
-          )}
-          
-          {collapsed && (
-            <div className="w-8 h-8 bg-gradient-to-br from-[#00FF88] to-[#10B981] rounded-lg flex items-center justify-center shadow-lg mx-auto">
-              <Shield className="w-5 h-5 text-black" />
+        <div className="flex items-center justify-center">
+          <Link href="/admin" className="flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-200">
+              <Image
+                src="/images/Spark icon logo.png"
+                alt="Spark Admin"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain"
+              />
             </div>
-          )}
+          </Link>
         </div>
       </div>
 

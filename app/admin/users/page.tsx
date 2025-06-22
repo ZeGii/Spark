@@ -14,7 +14,7 @@ import { UserActionsDropdown } from '@/components/admin/user-actions-dropdown'
 import { UserProfileModal } from '@/components/admin/user-profile-modal'
 import { UserBulkActionsToolbar } from '@/components/admin/user-bulk-actions-toolbar'
 import { DateFilter, DateRange } from '@/components/admin/date-filter'
-import { FilterState } from '@/components/admin/filter-bar'
+import { FilterState, FilterBar } from '@/components/admin/filter-bar'
 import { USER_FILTER_CONFIGS } from '@/components/admin/user-filters'
 import { filtersToSearchParams, hasActiveFilters } from '@/components/admin/filter-utils'
 import { toast } from 'sonner'
@@ -144,6 +144,23 @@ export default function AdminUsers() {
     fetchUserStats(dateRange)
     fetchCurrentUser()
   }, [pagination.page, pagination.pageSize, sortBy, sortOrder, dateRange])
+  
+  // Separate effect for filter changes to avoid dependency issues
+  useEffect(() => {
+    // Only fetch if there are actual filter changes
+    const hasFilters = Object.values(filterState).some(value => {
+      if (value === null || value === '' || value === undefined) return false
+      if (Array.isArray(value)) return value.length > 0
+      if (typeof value === 'object' && value !== null) return true
+      return true
+    })
+    
+    if (hasFilters || Object.keys(filterState).length > 0) {
+      fetchUsers()
+      // Reset to first page when filters change
+      setPagination(prev => ({ ...prev, page: 1 }))
+    }
+  }, [filterState])
 
   const fetchCurrentUser = async () => {
     try {
@@ -692,15 +709,39 @@ export default function AdminUsers() {
       {/* Users Table */}
       <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#252529] border border-white/20">
         <CardHeader>
-          <CardTitle className="text-white">
-            {dateRange ? `Filtered Users (${dateRange.label})` : 'All Users'}
-          </CardTitle>
-          <CardDescription className="text-[#CCCCCC]">
-            {dateRange ? 
-              `Showing users registered during ${dateRange.label.toLowerCase()}` :
-              'Manage user accounts, permissions, and status'
-            }
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white flex items-center gap-2">
+                {dateRange ? `Filtered Users (${dateRange.label})` : 'All Users'}
+                {hasActiveFilters(filterState) && (
+                  <Badge variant="secondary">
+                    Filtered
+                  </Badge>
+                )}
+              </CardTitle>
+              <CardDescription className="text-[#CCCCCC]">
+                {loading ? (
+                  "Loading users..."
+                ) : (
+                  `${pagination.total || 0} total users${
+                    hasActiveFilters(filterState) ? ' (filtered)' : ''
+                  }`
+                )}
+              </CardDescription>
+            </div>
+          </div>
+          
+          {/* Search and Filter Bar */}
+          <div className="mt-4 pt-4 border-t border-white/20">
+            <FilterBar
+              filters={USER_FILTER_CONFIGS}
+              filterState={filterState}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              loading={loading}
+              className="mb-0"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <UserBulkActionsToolbar
@@ -722,18 +763,12 @@ export default function AdminUsers() {
             onSortChange={handleSortChange}
             loading={loading}
             exportable={true}
-            emptyMessage="No users found"
+            emptyMessage={hasActiveFilters(filterState) ? 'No users match your filters' : 'No users found'}
             onRowClick={handleRowClick}
             bulkSelectable={true}
             selectedItems={selectedUsers}
             onSelectionChange={handleSelectionChange}
             getItemId={(user) => user.id}
-            // New filter props - Temporarily disabled to fix loading issues
-            showFilters={false}
-            filterConfigs={USER_FILTER_CONFIGS}
-            filterState={filterState}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
           />
         </CardContent>
       </Card>

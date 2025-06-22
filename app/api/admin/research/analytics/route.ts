@@ -57,10 +57,10 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const industryPerformance = industryData.map(item => ({
+    const industryPerformance = industryData.map((item: any) => ({
       industry: item.industry,
       count: item._count.industry,
-      percentage: Math.round((item._count.industry / industryData.reduce((sum, i) => sum + i._count.industry, 0)) * 100)
+      percentage: Math.round((item._count.industry / industryData.reduce((sum: number, i: any) => sum + i._count.industry, 0)) * 100)
     }))
 
     // Mock engagement data

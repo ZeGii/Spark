@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingUsers.length !== userIds.length) {
-      const foundIds = existingUsers.map(u => u.id)
+      const foundIds = existingUsers.map((u: any) => u.id)
       const missingIds = userIds.filter(id => !foundIds.includes(id))
       return NextResponse.json({ 
         error: `Some users not found: ${missingIds.join(', ')}` 

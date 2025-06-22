@@ -272,62 +272,40 @@ export function FilterBar({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Search and Filter Toggle Row */}
-      <div className="flex items-center gap-4">
+      {/* Single Row Layout - Search and All Filters */}
+      <div className="flex flex-wrap items-center gap-3">
         {/* Search Filter */}
         {searchFilter && renderFilter(searchFilter)}
 
-        {/* Filter Toggle Button */}
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={cn(
-            "flex items-center gap-2",
-            activeFilters > 0 && "border-primary bg-primary/5"
-          )}
-          disabled={loading}
-        >
-          <Filter className="w-4 h-4" />
-          <span>Filters</span>
-          {activeFilters > 0 && (
-            <Badge variant="secondary" className="ml-1">
-              {activeFilters}
-            </Badge>
-          )}
-        </Button>
+        {/* All Other Filters */}
+        {otherFilters.map(renderFilter)}
 
-        {/* Clear Filters */}
+        {/* Clear Filters Button */}
         {activeFilters > 0 && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onClearFilters}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 ml-2"
             disabled={loading}
           >
+            <X className="w-4 h-4" />
             Clear All
           </Button>
         )}
-      </div>
 
-      {/* Expanded Filter Controls */}
-      {isExpanded && otherFilters.length > 0 && (
-        <div className="flex flex-wrap items-center gap-3 p-4 border rounded-lg bg-muted/50">
-          {otherFilters.map(renderFilter)}
-          
-          {/* Apply Button (if needed) */}
-          {showApplyButton && onApplyFilters && (
-            <Button
-              onClick={onApplyFilters}
-              size="sm"
-              disabled={loading}
-              className="ml-auto"
-            >
-              Apply Filters
-            </Button>
-          )}
-        </div>
-      )}
+        {/* Apply Button (if needed) */}
+        {showApplyButton && onApplyFilters && (
+          <Button
+            onClick={onApplyFilters}
+            size="sm"
+            disabled={loading}
+            className="ml-auto"
+          >
+            Apply Filters
+          </Button>
+        )}
+      </div>
 
       {/* Active Filter Indicators */}
       {activeFilters > 0 && (

@@ -19,7 +19,7 @@ import VoteThresholdSettings from '@/components/admin/vote-threshold-settings'
 import CharacterLimitSettings from '@/components/admin/character-limit-settings'
 import WorkflowDashboard from '@/components/admin/workflow-dashboard'
 import { DateFilter, DateRange } from '@/components/admin/date-filter'
-import { FilterState } from '@/components/admin/filter-bar'
+import { FilterState, FilterBar } from '@/components/admin/filter-bar'
 import { TOPIC_FILTER_CONFIGS } from '@/components/admin/topic-filters'
 import { filtersToSearchParams, hasActiveFilters } from '@/components/admin/filter-utils'
 import { StatusBadge } from '@/components/ui/status-badge'
@@ -40,7 +40,8 @@ import {
   Settings,
   AlertTriangle,
   RefreshCw,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, PieChart, Pie, Cell } from 'recharts'
 import { getTopicPriority, formatTimeRemaining } from '@/lib/workflow-utils'
@@ -858,18 +859,22 @@ export default function AdminTopics() {
             >
               {!analyticsLoading && analytics?.categoryPerformance ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.categoryPerformance}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <BarChart
+                    data={analytics.categoryPerformance}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis 
                       dataKey="category" 
-                      tick={{ fontSize: 10 }}
                       tickLine={false}
-                      axisLine={false}
+                      tick={{ fontSize: 10 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
                     />
                     <YAxis 
-                      tick={{ fontSize: 10 }}
                       tickLine={false}
-                      axisLine={false}
+                      tick={{ fontSize: 10 }}
                     />
                     <RechartsTooltip 
                       contentStyle={{ 
@@ -880,105 +885,82 @@ export default function AdminTopics() {
                         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                       }}
                     />
-                    <Bar dataKey="total" fill="#94a3b8" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="qualified" fill="#10b981" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="total" fill="#e2e8f0" name="Total Topics" />
+                    <Bar dataKey="qualified" fill="#60B5FF" name="Qualified" />
                   </BarChart>
                 </ResponsiveContainer>
               ) : null}
             </ChartContainer>
           </div>
 
-          {/* Topic Management Section */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Topic Management</h2>
-                <p className="text-card-foreground text-sm">Review topics, manage workflow, and track progress</p>
-              </div>
-            </div>
+          {/* Bulk Actions Toolbar */}
+          {selectedTopics.length > 0 && (
+            <BulkActionsToolbar
+              selectedCount={selectedTopics.length}
+              selectedIds={selectedTopics}
+              onClearSelection={handleClearSelection}
+              onBulkDelete={handleBulkDelete}
+              onBulkApprove={handleBulkApprove}
+              onBulkReject={handleBulkReject}
+              totalCount={pagination.total}
+            />
+          )}
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={filter === 'all' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFilter('all')
-                    setPagination(prev => ({ ...prev, page: 1 }))
-                  }}
-                >
-                  All
-                </Button>
-                <Button
-                  variant={filter === 'PENDING' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFilter('PENDING')
-                    setPagination(prev => ({ ...prev, page: 1 }))
-                  }}
-                >
-                  Pending
-                </Button>
-                <Button
-                  variant={filter === 'APPROVED' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFilter('APPROVED')
-                    setPagination(prev => ({ ...prev, page: 1 }))
-                  }}
-                >
-                  Approved
-                </Button>
-                <Button
-                  variant={filter === 'QUALIFIED' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setFilter('QUALIFIED')
-                    setPagination(prev => ({ ...prev, page: 1 }))
-                  }}
-                >
-                  Qualified
-                </Button>
+          {/* Topics Table */}
+          <Card className="bg-card">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold text-foreground">
+                    Research Topics
+                    {hasActiveFilters(filterState) && (
+                      <Badge variant="secondary" className="ml-2">
+                        Filtered
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription className="text-card-foreground">
+                    {loading ? (
+                      "Loading topics..."
+                    ) : (
+                      `${pagination.total || 0} total topics${
+                        hasActiveFilters(filterState) ? ' (filtered)' : ''
+                      }`
+                    )}
+                  </CardDescription>
+                </div>
               </div>
-            </div>
-
-            <Card className="bg-card">
-              <CardContent className="p-6">
-                <BulkActionsToolbar
-                  selectedCount={selectedTopics.length}
-                  selectedIds={selectedTopics}
-                  onClearSelection={handleClearSelection}
-                  onBulkDelete={handleBulkDelete}
-                  onBulkApprove={handleBulkApprove}
-                  onBulkReject={handleBulkReject}
-                  totalCount={pagination.total}
-                />
-                
-                <AdminTable
-                  data={topics}
-                  columns={columns}
-                  pagination={pagination}
-                  onPageChange={handlePageChange}
-                  onPageSizeChange={handlePageSizeChange}
-                  onSortChange={handleSortChange}
-                  loading={loading}
-                  exportable={true}
-                  emptyMessage="No topics found"
-                  onRowClick={(topic) => openReviewModal(topic)}
-                  bulkSelectable={true}
-                  selectedItems={selectedTopics}
-                  onSelectionChange={handleSelectionChange}
-                  getItemId={(topic) => topic.id}
-                  // New filter props - Temporarily disabled to fix loading issues
-                  showFilters={false}
-                  filterConfigs={TOPIC_FILTER_CONFIGS}
+              
+              {/* Search and Filter Bar - Single Row Layout */}
+              <div className="mt-4 pt-4 border-t border-border">
+                <FilterBar
+                  filters={TOPIC_FILTER_CONFIGS}
                   filterState={filterState}
                   onFilterChange={handleFilterChange}
                   onClearFilters={handleClearFilters}
+                  loading={loading}
+                  className="mb-0"
                 />
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <AdminTable
+                data={topics}
+                columns={columns}
+                loading={loading}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                onSortChange={handleSortChange}
+                bulkSelectable={true}
+                selectedItems={selectedTopics}
+                onSelectionChange={handleSelectionChange}
+                getItemId={(topic: Topic) => topic.id}
+                emptyMessage={hasActiveFilters(filterState) ? 'No topics match your filters' : 'No topics found'}
+                onRowClick={(topic: Topic) => openReviewModal(topic)}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Workflow Tab */}

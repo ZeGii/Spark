@@ -38,7 +38,7 @@ export async function POST(
     }
 
     // Start a transaction to create research record and update topic
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Create research record
       const research = await tx.research.create({
         data: {
